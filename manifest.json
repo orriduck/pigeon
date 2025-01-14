@@ -2,20 +2,17 @@
   "manifest_version": 3,
   "name": "Pigeon - Job Networking Assistant",
   "version": "1.0",
-  "description": "AI-powered Chrome extension to help draft personalized messages for job networking on LinkedIn",
+  "description": "AI-powered networking assistant for job seekers",
   "permissions": [
-    "activeTab",
     "storage",
-    "sidePanel",
-    "scripting"
+    "tabs",
+    "activeTab",
+    "scripting",
+    "sidePanel"
   ],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-  "side_panel": {
-    "default_path": "sidepanel.html"
-  },
+  "host_permissions": [
+    "https://*.linkedin.com/*"
+  ],
   "action": {
     "default_title": "Pigeon",
     "default_icon": {
@@ -24,18 +21,14 @@
       "128": "icons/icon128.png"
     }
   },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": ["*://*.linkedin.com/*"],
-      "js": ["content.js"]
-    }
-  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   }
 }

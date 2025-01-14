@@ -2,16 +2,59 @@ This is a chrome extension to help a person to draft the initial private message
 
 The user will interact with the extension by the following steps and scenarios:
 
+User interaction
+
 - First time open
   - The extension will open a sidebar to let the user submit the resume
   - User will be also asked to paste the openai api key to the extension
   - Chrome extension will save the resume and openai api key temporarily in chrome storage and will not be sent to any server
-  - After that, we will show a screen saying the setup is done, asking user to browse around someone that is hiring
-- When user find someone on the linkedin that indicates it's hiring (We might be able to know that by parsing the webpage)
-  - User will click the extension, sidebar opens again
-  - User will be given an option to
+  - After that, we will show the successful screen saying the setup is done, with a button to open linkedin.com
+    - When user click the button, the extension will open linkedin.com
+- When user is opening a page that is not linkedin
+  - Sidebar will continue showing show the successful screen, with a button to open linkedin.com
+    - When user click the button, the extension will open linkedin.com
+- When user is opening a linkedin user page
+  - extension will check if the user having a hiring indicator
+  - If user is hiring, user will be given an options to
     1. Send a private message asking for referral position
         - When the user clicks this option, the extension will display an input box where user can enter the position link
+        - Once user fill in the link, user will need to click the "confirm" button
+        - Once button is clicked, the extension will load the page behind the stage, display a small card indicates the position that the user is interested for
+            - If the user is given a wrong link that is not a position page, the extension will show an error message on that card and let user to update the position link
         - Once fillled, the extension will display a text area where AI will generate a message based on the position, resume and referral link, and let user to edit
     2. Send a private message to ask a zoom call with the person
         - When the user clicks this option, the extension will display a text area where AI will generate a message based on the resume and, and let user to edit
+
+
+Screens
+
+- Setup Screen (When user first open the extension)
+  - Show the message to let user know the setup is in progress
+  - Show the message to let user know they need to provide the resume and openai api key
+  - Input for resume
+  - Input for openai api key
+  - Button to save the settings
+- Successful Screen (When user setup the resume and openai api key, and user is not on a linkedin profile page)
+  - Show the message to let the user know the setup is done
+  - Show the message to let user browse linkedin.com and find user they want to connect with
+  - Button to open linkedin.com
+  - Button to start over the setup process, this will clear the storage and let user to start over the setup process
+- LinkedIn Profile Screen (Showes when user is on a linkedin profile page, the url has linkedin.com/in/ in it)
+  - Show a card that indicates the linkedin user that user is on, and the latest position that linkedin user is in
+  - Show the message to let user know that whether the linkedin user is not currently hiring
+  - Show the two buttons to let user to decide what to do
+    1. Send a private message asking for referral position
+    2. Send a private message to ask a zoom call with the person
+  - Conditionally show the draft message text area
+  - Conditionally show the regenerate button and the copy to clipboard button
+
+
+Notes
+- No emoji used in the html
+
+Project structure
+- manifest.json: Extension configuration
+- sidepanel.html: Main UI
+- styles.css: Styling
+- src/components folder: Storing the different screens during the user interaction
+- src/utils folder: Storing the helper functions to contact openai or contact the browser to parse the webpage information

@@ -1,167 +1,279 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pigeon</title>
-  <link href="styles.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pigeon - LinkedIn Message Assistant</title>
   <style>
-    /* Custom styles */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #1a202c;
+      line-height: 1.5;
+      padding: 16px;
+    }
+
     .screen {
       display: none;
+      max-width: 32rem;
+      margin: 0 auto;
     }
+
     .screen.active {
       display: block;
     }
-    
-    /* Reset styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2563eb;
+      margin-bottom: 0.5rem;
     }
 
-    /* Improved form styles */
-    input[type="file"] {
-      padding: 0.5rem;
-      border-radius: 0.375rem;
-      border: 1px solid #d1d5db;
-      width: 100%;
+    p {
+      color: #4b5563;
+      margin-bottom: 1rem;
     }
 
-    input[type="file"]::-webkit-file-upload-button {
+    .success-content {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .check-icon {
+      font-size: 2rem;
+      color: #22c55e;
+      margin-bottom: 1rem;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 0.5rem 1rem;
-      background-color: #e0f2fe;
-      color: #0284c7;
-      border: none;
       border-radius: 0.375rem;
+      font-size: 0.875rem;
       font-weight: 500;
-      margin-right: 1rem;
       cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
     }
 
-    input[type="file"]::-webkit-file-upload-button:hover {
-      background-color: #bfdbfe;
+    .button.primary {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .button.primary:hover {
+      background-color: #1d4ed8;
+    }
+
+    .button.secondary {
+      background-color: white;
+      color: #4b5563;
+      border-color: #d1d5db;
+    }
+
+    .button.secondary:hover {
+      background-color: #f3f4f6;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="file"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
     }
 
     textarea {
       resize: vertical;
       min-height: 150px;
-      line-height: 1.5;
+      font-family: inherit;
+    }
+
+    .help-text {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .option-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .option-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background-color: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .option-button:hover {
+      border-color: #2563eb;
+      background-color: #f8fafc;
+    }
+
+    .profile-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 1rem;
+    }
+
+    .profile-name {
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-position {
+      color: #4b5563;
       font-size: 0.875rem;
     }
 
-    /* Smooth transitions */
-    .transition-all {
-      transition-property: all;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 150ms;
+    .message-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading-content {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased">
-  <div id="setup-screen" class="screen active p-6 max-w-md mx-auto">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-blue-600 mb-2">Welcome to Pigeon!</h2>
-      <p class="text-gray-600">Let's get you set up to make meaningful connections.</p>
-    </div>
-    
-    <div class="space-y-6">
-      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <div class="mb-6 p-3 bg-blue-50 rounded-md text-sm text-blue-700">
-          <p class="font-medium mb-1">🔒 Your Privacy is Important</p>
-          <p>Your resume and API key will be stored securely in your browser's local storage only. They will never be sent to any external server except OpenAI for message generation.</p>
-        </div>
-
-        <label class="block mb-4">
-          <span class="text-gray-700 font-medium">Upload your resume (PDF)</span>
-          <div class="mt-2">
-            <input type="file" id="resume" accept=".pdf" required
-              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"/>
-          </div>
-        </label>
-
-        <label class="block">
-          <span class="text-gray-700 font-medium">OpenAI API Key</span>
-          <input type="password" id="api-key" placeholder="Enter your OpenAI API key" required
-            class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 placeholder-gray-400"/>
-          <p class="mt-1 text-sm text-gray-500">Your API key is only used to generate messages via OpenAI's API</p>
-        </label>
-      </div>
-
-      <button id="save-setup" 
-        class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-        Save and Continue
-      </button>
+<body>
+  <div id="loading-screen" class="screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p id="loading-text">Loading...</p>
     </div>
   </div>
 
-  <div id="success-screen" class="screen p-6 text-center">
-    <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
-      <div class="mb-4">
-        <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-          <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </div>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">You're all set! 🎉</h2>
-      <p class="text-gray-600">Start browsing LinkedIn to connect with hiring managers.</p>
+  <div id="setup-screen" class="screen">
+    <div class="success-content">
+      <h2>Welcome to Pigeon!</h2>
+      <p>Let's get you set up to make meaningful connections.</p>
+    </div>
+
+    <div class="section">
+      <label for="resume">Upload your resume (PDF)</label>
+      <input type="file" id="resume" accept=".pdf" />
+      <p class="help-text">This helps us personalize your messages.</p>
+    </div>
+
+    <div class="section">
+      <label for="api-key">OpenAI API Key</label>
+      <input type="password" id="api-key" placeholder="sk-..." />
+      <p class="help-text">Required for AI-powered message generation.</p>
+    </div>
+
+    <div class="button-group">
+      <button id="save-settings" class="button primary">Save Settings</button>
     </div>
   </div>
 
-  <div id="message-screen" class="screen p-6">
-    <div class="max-w-md mx-auto space-y-6">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">Draft a Message</h2>
+  <div id="success-screen" class="screen">
+    <div class="success-content">
+      <div class="check-icon">✓</div>
+      <h2>You're all set!</h2>
+      <p>Start connecting with hiring managers on LinkedIn.</p>
       
-      <div class="grid grid-cols-2 gap-4">
-        <button id="referral-btn" 
-          class="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-sm transition-all">
-          <svg class="w-6 h-6 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-          </svg>
-          <span class="font-medium">Ask for Referral</span>
-        </button>
-
-        <button id="meeting-btn"
-          class="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-sm transition-all">
-          <svg class="w-6 h-6 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-          </svg>
-          <span class="font-medium">Request Meeting</span>
-        </button>
-      </div>
-
-      <div id="referral-form" class="hidden bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <label class="block mb-4">
-          <span class="text-gray-700 font-medium">Position Link</span>
-          <input type="url" id="position-link" placeholder="Paste the job posting URL"
-            class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 placeholder-gray-400"/>
-        </label>
-        <button id="generate-referral" 
-          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-          Generate Message
-        </button>
-      </div>
-
-      <div id="message-editor" class="hidden space-y-4">
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <textarea id="message-content" rows="8" placeholder="Your message will appear here..."
-            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 placeholder-gray-400"></textarea>
-        </div>
-        
-        <div class="flex gap-4">
-          <button id="copy-message" 
-            class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-            Copy to Clipboard
-          </button>
-          <button id="regenerate" 
-            class="flex-1 bg-blue-50 text-blue-700 py-2 px-4 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-            Regenerate
-          </button>
-        </div>
+      <div class="button-group">
+        <button id="open-linkedin" class="button primary">Open LinkedIn</button>
+        <button id="start-over" class="button secondary">Start Over</button>
       </div>
     </div>
   </div>
 
-  <script src="sidepanel.js"></script>
+  <div id="linkedin-profile-screen" class="screen">
+    <div class="profile-card">
+      <div class="profile-name" id="profile-name">Loading...</div>
+      <div class="profile-position" id="profile-position">Loading...</div>
+    </div>
+
+    <div id="not-hiring" class="section hidden">
+      <p>This person is not currently hiring. Try finding someone else who is actively hiring.</p>
+      <button class="button primary">Continue Browsing</button>
+    </div>
+
+    <div id="hiring-options" class="section">
+      <h2>Choose Message Type</h2>
+      <div class="option-buttons">
+        <button id="referral-btn" class="option-button">
+          <span>Ask for Referral</span>
+        </button>
+        <button id="meeting-btn" class="option-button">
+          <span>Request Meeting</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="message-section" class="section hidden">
+      <label for="message">Draft Message</label>
+      <textarea id="message" placeholder="Generating message..."></textarea>
+      <div class="message-actions">
+        <button id="copy-message" class="button secondary">Copy to Clipboard</button>
+        <button id="regenerate" class="button secondary">Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidepanel.js" type="module"></script>
 </body>
 </html>
