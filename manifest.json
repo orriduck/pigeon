@@ -2,33 +2,29 @@
   "manifest_version": 3,
   "name": "Pigeon - Job Networking Assistant",
   "version": "1.0",
-  "description": "AI-powered networking assistant for job seekers",
+  "description": "AI-powered networking assistant for LinkedIn",
   "permissions": [
-    "storage",
-    "tabs",
     "activeTab",
+    "storage",
     "scripting",
     "sidePanel"
   ],
   "host_permissions": [
-    "https://*.linkedin.com/*"
+    "https://api.openai.com/*",
+    "https://www.linkedin.com/*"
   ],
   "action": {
-    "default_title": "Pigeon",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "default_title": "Pigeon"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

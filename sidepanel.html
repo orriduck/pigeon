@@ -152,15 +152,100 @@
       margin-bottom: 1rem;
     }
 
-    .profile-name {
+    .profile-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .profile-header h2 {
+      margin: 0;
+      font-size: 24px;
+      color: #1a1a1a;
+    }
+
+    .profile-header .subtitle {
+      width: 100%;
+      margin: 4px 0 0;
+      font-size: 16px;
+      color: #666;
+    }
+
+    .badge {
+      display: none;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
       font-weight: 600;
-      font-size: 1.125rem;
-      margin-bottom: 0.25rem;
+      color: white;
+      background: linear-gradient(135deg, #00a0dc 0%, #0077b5 100%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-left: 8px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .badge::before {
+      content: '🎯';
+      margin-right: 4px;
+    }
+
+    .badge.visible {
+      display: inline-flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+    }
+
+    .hiring-badge {
+      display: none;
+      background: linear-gradient(135deg, #22c55e15 0%, #22c55e30 100%);
+      color: #16a34a;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      border: 1px solid #22c55e40;
+      margin-left: 0.75rem;
+      animation: badge-fade-in 0.3s ease-out;
+      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .hiring-badge.visible {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .hiring-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(34, 197, 94, 0.15);
+    }
+
+    @keyframes badge-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .profile-position {
+      font-size: 1rem;
       color: #4b5563;
-      font-size: 0.875rem;
     }
 
     .message-actions {
@@ -187,6 +272,10 @@
       animation: spin 1s linear infinite;
     }
 
+    .message-container {
+      padding-top: 1rem;
+    }
+
     @keyframes spin {
       0% {
         transform: rotate(0deg);
@@ -198,78 +287,62 @@
   </style>
 </head>
 <body>
-  <div id="loading-screen" class="screen">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p id="loading-text">Loading...</p>
+  <!-- Setup Screen -->
+  <div id="setup" class="screen">
+    <h1>Welcome to Pigeon</h1>
+    <div class="setup-form">
+      <div class="form-group">
+        <label for="resume">Upload Resume (PDF)</label>
+        <input type="file" id="resume" accept=".pdf" required>
+      </div>
+      <div class="form-group">
+        <label for="apiKey">OpenAI API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-..." required>
+      </div>
+      <button id="saveSettings" class="button primary">Save Settings</button>
     </div>
   </div>
 
-  <div id="setup-screen" class="screen">
-    <div class="success-content">
-      <h2>Welcome to Pigeon!</h2>
-      <p>Let's get you set up to make meaningful connections.</p>
-    </div>
+  <!-- Loading Screen -->
+  <div id="loading" class="screen" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p id="loadingText">Loading...</p>
+  </div>
 
-    <div class="section">
-      <label for="resume">Upload your resume (PDF)</label>
-      <input type="file" id="resume" accept=".pdf" />
-      <p class="help-text">This helps us personalize your messages.</p>
-    </div>
-
-    <div class="section">
-      <label for="api-key">OpenAI API Key</label>
-      <input type="password" id="api-key" placeholder="sk-..." />
-      <p class="help-text">Required for AI-powered message generation.</p>
-    </div>
-
+  <!-- Success Screen -->
+  <div id="success" class="screen" style="display: none;">
+    <h1>Setup Complete!</h1>
+    <p>You're all set to start networking on LinkedIn.</p>
     <div class="button-group">
-      <button id="save-settings" class="button primary">Save Settings</button>
+      <button id="openLinkedIn" class="button primary">Go to LinkedIn</button>
+      <button id="startOver" class="button secondary">Start Over</button>
     </div>
   </div>
 
-  <div id="success-screen" class="screen">
-    <div class="success-content">
-      <div class="check-icon">✓</div>
-      <h2>You're all set!</h2>
-      <p>Start connecting with hiring managers on LinkedIn.</p>
-      
+  <!-- LinkedIn Profile Screen -->
+  <div id="linkedinProfile" class="screen" style="display: none;">
+    <div class="profile-header">
+      <h2 id="profileName"></h2>
+      <div id="hiringBadge" class="badge">Hiring</div>
+      <p id="profilePosition" class="subtitle"></p>
+    </div>
+
+    <div class="message-options">
+      <h3>Choose Message Type</h3>
       <div class="button-group">
-        <button id="open-linkedin" class="button primary">Open LinkedIn</button>
-        <button id="start-over" class="button secondary">Start Over</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="linkedin-profile-screen" class="screen">
-    <div class="profile-card">
-      <div class="profile-name" id="profile-name">Loading...</div>
-      <div class="profile-position" id="profile-position">Loading...</div>
-    </div>
-
-    <div id="not-hiring" class="section hidden">
-      <p>This person is not currently hiring. Try finding someone else who is actively hiring.</p>
-      <button class="button primary">Continue Browsing</button>
-    </div>
-
-    <div id="hiring-options" class="section">
-      <h2>Choose Message Type</h2>
-      <div class="option-buttons">
-        <button id="referral-btn" class="option-button">
-          <span>Ask for Referral</span>
-        </button>
-        <button id="meeting-btn" class="option-button">
-          <span>Request Meeting</span>
-        </button>
+        <button id="referralBtn" class="button primary">Ask for Referral</button>
+        <button id="meetingBtn" class="button primary">Request Meeting</button>
+        <button id="connectBtn" class="button primary">Connect</button>
       </div>
     </div>
 
-    <div id="message-section" class="section hidden">
-      <label for="message">Draft Message</label>
-      <textarea id="message" placeholder="Generating message..."></textarea>
-      <div class="message-actions">
-        <button id="copy-message" class="button secondary">Copy to Clipboard</button>
-        <button id="regenerate" class="button secondary">Regenerate</button>
+    <div id="messageSection" class="message-section hidden">
+      <div class="message-container">
+        <textarea id="message" rows="6" placeholder="Your message will appear here..."></textarea>
+        <div class="button-group">
+          <button id="regenerate" class="button secondary">Regenerate</button>
+          <button id="copyMessage" class="button primary">Copy to Clipboard</button>
+        </div>
       </div>
     </div>
   </div>

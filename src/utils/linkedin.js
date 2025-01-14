@@ -78,11 +78,9 @@ async function parseLinkedInProfile() {
         
         // Get name - try multiple selectors based on the HTML structure
         const nameSelectors = [
-          // New selectors based on the HTML structure
           'h1.break-words',
           '.artdeco-hoverable-trigger h1',
           '[class*="break-words"] h1',
-          // Backup selectors
           'h1.text-heading-xlarge',
           'h1.inline.t-24.t-black.t-normal.break-words',
           '.pv-text-details__left-panel h1'
@@ -103,10 +101,8 @@ async function parseLinkedInProfile() {
 
         // Get current position - try multiple selectors
         const positionSelectors = [
-          // New selectors based on common LinkedIn classes
           '[class*="text-body-medium"]',
           '[class*="break-words"][class*="text-body"]',
-          // Backup selectors
           'div.text-body-medium.break-words',
           '.pv-text-details__left-panel .text-body-medium',
           'div[aria-label="Current company"]',
@@ -133,46 +129,58 @@ async function parseLinkedInProfile() {
         // Check if person is hiring - more comprehensive check
         console.log('Checking if person is hiring...');
         const isHiring = (() => {
-          // Check page content for hiring indicators
-          const pageContent = document.body.textContent.toLowerCase();
-          const hiringKeywords = ['hiring', 'we\'re hiring', 'looking for', 'open position', 'job opening'];
-          console.log('Checking for keywords:', hiringKeywords);
+          // Check for hiring badge in profile picture
+          const hiringBadgeSelectors = [
+            '.hiring-badge',
+            '[class*="hiring-badge"]',
+            '.pv-top-card-profile-picture__container .member-36',
+            'img[alt*="#HIRING"]',
+            '.pv-top-card__photo-wrapper [class*="member"]'
+          ];
           
-          // Check profile sections
-          const hasHiringIndicator = hiringKeywords.some(keyword => {
-            const includes = pageContent.includes(keyword);
-            console.log(`Keyword "${keyword}":`, includes);
-            return includes;
+          const hasHiringBadge = hiringBadgeSelectors.some(selector => {
+            const found = document.querySelector(selector) !== null;
+            console.log(`Hiring badge selector "${selector}":`, found);
+            return found;
           });
+          console.log('Has hiring badge UI element:', hasHiringBadge);
+
+          // Check for "Hiring" text in the profile header or title
+          const headerText = [
+            document.querySelector('.pv-text-details__left-panel')?.textContent || '',
+            document.querySelector('.top-card-layout__headline')?.textContent || '',
+            document.querySelector('.profile-topcard-person-entity__content')?.textContent || '',
+            document.title || ''
+          ].join(' ').toLowerCase();
           
-          // Check recent activity
-          const activitySection = document.querySelector('#activity');
-          const recentPosts = activitySection ? activitySection.textContent.toLowerCase() : '';
-          console.log('Found activity section:', !!activitySection);
+          const hasHiringInHeader = headerText.includes('hiring');
+          console.log('Has hiring in header:', hasHiringInHeader);
+
+          // Check for "Open to work" badge
+          const openToWorkSelectors = [
+            '[class*="open-to-work-badge"]',
+            '.pv-top-card--open-to-work-badge',
+            '.profile-topcard__open-to-work-badge'
+          ];
           
-          const hasRecentHiringPost = hiringKeywords.some(keyword => {
-            const includes = recentPosts.includes(keyword);
-            console.log(`Recent post keyword "${keyword}":`, includes);
-            return includes;
+          const hasOpenToWork = openToWorkSelectors.some(selector => {
+            const found = document.querySelector(selector) !== null;
+            console.log(`Open to work selector "${selector}":`, found);
+            return found;
           });
-          
-          // Check experience section for recruiter/hiring manager roles
-          const currentRole = position.toLowerCase();
-          const isRecruiter = currentRole.includes('recruit') || 
-                            currentRole.includes('talent') || 
-                            currentRole.includes('hiring') ||
-                            currentRole.includes('hr');
-          console.log('Is recruiter role:', isRecruiter);
-          
-          // Also check for hiring badge
-          const hasHiringBadge = document.querySelector('.hiring-badge') !== null;
-          console.log('Has hiring badge:', hasHiringBadge);
-          
-          const finalResult = hasHiringIndicator || hasRecentHiringPost || isRecruiter || hasHiringBadge;
+          console.log('Has open to work badge:', hasOpenToWork);
+
+          // Check for hiring section
+          const hasHiringSection = document.querySelector('[data-test-id*="hiring"]') !== null ||
+                          document.querySelector('[data-control-name*="hiring"]') !== null;
+          console.log('Has hiring section:', hasHiringSection);
+
+          // Final hiring check
+          const finalResult = hasHiringBadge || hasHiringInHeader || hasOpenToWork || hasHiringSection;
           console.log('Final hiring check result:', finalResult);
           return finalResult;
         })();
-
+        
         const result = { name, position, isHiring };
         console.log('Final parsed data:', result);
         return result;

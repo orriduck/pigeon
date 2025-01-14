@@ -7,7 +7,6 @@ yarn.lock
 dist/
 build/
 *.zip
-styles.css
 
 # Environment variables
 .env
