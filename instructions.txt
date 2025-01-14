@@ -1,0 +1,17 @@
+This is a chrome extension to help a person to draft the initial private message to someone who is hiring for a job which the user is interested.
+
+The user will interact with the extension by the following steps and scenarios:
+
+- First time open
+  - The extension will open a sidebar to let the user submit the resume
+  - User will be also asked to paste the openai api key to the extension
+  - Chrome extension will save the resume and openai api key temporarily in chrome storage and will not be sent to any server
+  - After that, we will show a screen saying the setup is done, asking user to browse around someone that is hiring
+- When user find someone on the linkedin that indicates it's hiring (We might be able to know that by parsing the webpage)
+  - User will click the extension, sidebar opens again
+  - User will be given an option to
+    1. Send a private message asking for referral position
+        - When the user clicks this option, the extension will display an input box where user can enter the position link
+        - Once fillled, the extension will display a text area where AI will generate a message based on the position, resume and referral link, and let user to edit
+    2. Send a private message to ask a zoom call with the person
+        - When the user clicks this option, the extension will display a text area where AI will generate a message based on the resume and, and let user to edit
